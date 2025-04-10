@@ -11,7 +11,6 @@ const EchoSphere = () => {
   const [isSpeaking, setIsSpeaking] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
-  const [useCorsProxy, setUseCorsProxy] = useState(false);
   
   const recognitionRef = useRef<any>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
@@ -93,26 +92,15 @@ const EchoSphere = () => {
     setError(null);
     
     try {
-      // オリジナルのAPIエンドポイント
-      let apiUrl = 'https://junya-indeed.app.n8n.cloud/webhook/jarvis';
-      
-      // CORSプロキシを使用する場合
-      if (useCorsProxy) {
-        // CORS Anywhereなどの公開プロキシを使用
-        apiUrl = `https://cors-anywhere.herokuapp.com/${apiUrl}`;
-        console.log('CORSプロキシを使用してリクエスト:', apiUrl);
-      }
+      // Netlify Functionsプロキシを使用
+      const apiUrl = '/.netlify/functions/proxy-api';
       
       const response = await fetch(apiUrl, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
           'Accept': 'application/json',
-          ...(useCorsProxy && { 'X-Requested-With': 'XMLHttpRequest' }),
         },
-        mode: 'cors', // CORSモードを維持
-        credentials: 'omit', // CORSリクエストではクッキーを送信しない
-        cache: 'no-cache', // キャッシュを使用しない
         body: JSON.stringify({ text }),
       });
 
@@ -147,17 +135,6 @@ const EchoSphere = () => {
       let errorMessage = '';
       if (err instanceof TypeError && err.message === 'Failed to fetch') {
         errorMessage = 'APIサーバーに接続できません。ネットワーク接続またはCORS設定を確認してください。';
-        
-        // 通常のリクエストでエラーが発生し、まだCORSプロキシを試していない場合
-        if (!useCorsProxy) {
-          setUseCorsProxy(true);
-          setError('CORSエラーが発生しました。プロキシを使用して再試行します...');
-          // 少し待ってから再試行
-          setTimeout(() => {
-            sendToAPI(text);
-          }, 1000);
-          return;
-        }
       } else if (err instanceof Error) {
         errorMessage = err.message;
       } else {
@@ -171,11 +148,6 @@ const EchoSphere = () => {
     } finally {
       setIsLoading(false);
     }
-  };
-
-  const toggleCorsProxy = () => {
-    setUseCorsProxy(!useCorsProxy);
-    setError(null);
   };
 
   const speak = (text: string) => {
@@ -201,14 +173,6 @@ const EchoSphere = () => {
       {error && (
         <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
           {error}
-          {error.includes('CORS') && (
-            <button 
-              onClick={toggleCorsProxy}
-              className="ml-2 text-sm underline"
-            >
-              {useCorsProxy ? 'プロキシを無効にする' : 'プロキシを有効にする'}
-            </button>
-          )}
         </div>
       )}
 
@@ -241,11 +205,6 @@ const EchoSphere = () => {
       </div>
 
       <div className="flex flex-col items-center">
-        {useCorsProxy && (
-          <div className="text-xs text-yellow-600 mb-2">
-            CORSプロキシ使用中
-          </div>
-        )}
         <button
           onClick={toggleListening}
           className={`w-16 h-16 rounded-full flex items-center justify-center focus:outline-none 
