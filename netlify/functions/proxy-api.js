@@ -19,7 +19,7 @@ exports.handler = async function(event, context) {
     const requestBody = JSON.parse(event.body);
     
     // APIエンドポイント
-    const apiUrl = 'https://junya-indeed.app.n8n.cloud/webhook/jarvis';
+    const apiUrl = 'https://junya-indeed.app.n8n.cloud/webhook-test/jarvis';
     
     // APIにリクエストを転送
     const response = await axios.post(apiUrl, requestBody, {
@@ -40,13 +40,33 @@ exports.handler = async function(event, context) {
     };
   } catch (error) {
     console.log('Error:', error);
+    console.log('Error details:', error.response?.data);
     
-    // エラー応答
+    // レスポンスがあれば詳細を返す
+    if (error.response) {
+      return {
+        statusCode: error.response.status,
+        body: JSON.stringify({
+          error: error.message,
+          details: error.response.data,
+          status: error.response.status,
+          statusText: error.response.statusText
+        }),
+        headers: {
+          'Access-Control-Allow-Origin': '*',
+          'Access-Control-Allow-Headers': 'Content-Type',
+          'Content-Type': 'application/json'
+        }
+      };
+    }
+    
+    // その他のエラー応答
     return {
-      statusCode: error.response?.status || 500,
+      statusCode: 500,
       body: JSON.stringify({
         error: error.message,
-        details: error.response?.data || 'Internal Server Error'
+        stack: process.env.NODE_ENV === 'development' ? error.stack : undefined,
+        details: 'Internal Server Error'
       }),
       headers: {
         'Access-Control-Allow-Origin': '*',
