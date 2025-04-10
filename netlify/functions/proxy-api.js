@@ -19,7 +19,7 @@ exports.handler = async function(event, context) {
     const requestBody = JSON.parse(event.body);
     
     // APIエンドポイント
-    const apiUrl = 'https://junya-indeed.app.n8n.cloud/webhook-test/jarvis';
+    const apiUrl = 'https://junya-indeed.app.n8n.cloud/webhook/jarvis';
     
     // APIにリクエストを転送
     const response = await axios.post(apiUrl, requestBody, {
