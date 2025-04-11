@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, FormEvent } from 'react';
 
 interface Message {
   type: 'user' | 'system';
@@ -11,9 +11,11 @@ const EchoSphere = () => {
   const [isSpeaking, setIsSpeaking] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
+  const [inputText, setInputText] = useState('');
   
   const recognitionRef = useRef<any>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const inputRef = useRef<HTMLInputElement>(null);
 
   // ブラウザの互換性チェック
   const speechRecognitionSupported = 'webkitSpeechRecognition' in window || 'SpeechRecognition' in window;
@@ -166,6 +168,19 @@ const EchoSphere = () => {
     window.speechSynthesis.speak(utterance);
   };
 
+  const handleInput = (e: FormEvent<HTMLInputElement>) => {
+    setInputText(e.currentTarget.value);
+  };
+
+  const handleSubmit = (e: FormEvent) => {
+    e.preventDefault();
+    if (inputText.trim() !== '') {
+      addMessage('user', inputText);
+      sendToAPI(inputText);
+      setInputText('');
+    }
+  };
+
   return (
     <div className="flex flex-col h-screen max-w-md mx-auto p-4 pb-8 overflow-hidden">
       <h1 className="text-2xl font-bold text-center mb-4 text-green-500">EchoSphere</h1>
@@ -204,34 +219,58 @@ const EchoSphere = () => {
         )}
       </div>
 
-      <div className="flex flex-col items-center mt-auto">
-        <button
-          onClick={toggleListening}
-          className={`w-16 h-16 rounded-full flex items-center justify-center focus:outline-none 
-            ${isLoading 
-              ? 'bg-gray-700 cursor-not-allowed' 
-              : isListening 
-                ? 'bg-red-600 animate-pulse' 
-                : 'bg-green-500 hover:bg-green-400'
-            } transition-colors`}
-          disabled={!speechRecognitionSupported || isLoading}
-        >
-          {isLoading ? (
-            <svg className="animate-spin h-8 w-8 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-              <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-              <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+      <div className="mt-auto w-full">
+        <form onSubmit={handleSubmit} className="w-full flex space-x-2 mb-4">
+          <input
+            type="text"
+            value={inputText}
+            onChange={handleInput}
+            ref={inputRef}
+            className="flex-1 p-3 border border-gray-700 rounded-lg text-gray-100 bg-gray-800 focus:outline-none focus:ring-2 focus:ring-green-500"
+            placeholder="メッセージを入力..."
+            disabled={isLoading}
+          />
+          <button
+            type="submit"
+            className={`p-3 rounded-lg ${isLoading ? 'bg-gray-700 cursor-not-allowed' : 'bg-green-600 hover:bg-green-500'} text-white`}
+            disabled={isLoading || inputText.trim() === ''}
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
             </svg>
-          ) : isListening ? (
-            <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 10a1 1 0 011-1h4a1 1 0 011 1v4a1 1 0 01-1 1h-4a1 1 0 01-1-1v-4z" />
-            </svg>
-          ) : (
-            <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z" />
-            </svg>
-          )}
-        </button>
+          </button>
+        </form>
+        
+        <div className="flex flex-col items-center">
+          <p className="text-xs text-gray-500 mb-2">または音声で話す</p>
+          <button
+            onClick={toggleListening}
+            className={`w-16 h-16 rounded-full flex items-center justify-center focus:outline-none 
+              ${isLoading 
+                ? 'bg-gray-700 cursor-not-allowed' 
+                : isListening 
+                  ? 'bg-red-600 animate-pulse' 
+                  : 'bg-green-500 hover:bg-green-400'
+              } transition-colors shadow-lg`}
+            disabled={!speechRecognitionSupported || isLoading}
+          >
+            {isLoading ? (
+              <svg className="animate-spin h-8 w-8 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+              </svg>
+            ) : isListening ? (
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 10a1 1 0 011-1h4a1 1 0 011 1v4a1 1 0 01-1 1h-4a1 1 0 01-1-1v-4z" />
+              </svg>
+            ) : (
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z" />
+              </svg>
+            )}
+          </button>
+        </div>
       </div>
 
       {isSpeaking && (
