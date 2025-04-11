@@ -167,18 +167,18 @@ const EchoSphere = () => {
   };
 
   return (
-    <div className="flex flex-col h-screen max-w-md mx-auto p-4">
-      <h1 className="text-2xl font-bold text-center mb-4">EchoSphere</h1>
+    <div className="flex flex-col h-screen max-w-md mx-auto p-4 pb-8 overflow-hidden">
+      <h1 className="text-2xl font-bold text-center mb-4 text-green-500">EchoSphere</h1>
       
       {error && (
-        <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
+        <div className="bg-red-900 border border-red-700 text-red-100 px-4 py-3 rounded mb-4">
           {error}
         </div>
       )}
 
-      <div className="flex-1 overflow-y-auto mb-4 bg-gray-50 rounded-lg p-4 shadow-inner">
+      <div className="flex-1 overflow-y-auto mb-4 bg-gray-900 rounded-lg p-4 shadow-inner text-gray-100">
         {messages.length === 0 ? (
-          <div className="flex items-center justify-center h-full text-gray-400">
+          <div className="flex items-center justify-center h-full text-gray-500">
             <p>ボタンをクリックして会話を開始してください</p>
           </div>
         ) : (
@@ -191,8 +191,8 @@ const EchoSphere = () => {
                 <div 
                   className={`max-w-[75%] rounded-lg px-4 py-2 ${
                     message.type === 'user' 
-                      ? 'bg-blue-500 text-white rounded-br-none' 
-                      : 'bg-gray-200 text-gray-800 rounded-bl-none'
+                      ? 'bg-green-600 text-white rounded-br-none' 
+                      : 'bg-gray-800 text-gray-100 rounded-bl-none'
                   }`}
                 >
                   {message.text}
@@ -204,15 +204,15 @@ const EchoSphere = () => {
         )}
       </div>
 
-      <div className="flex flex-col items-center">
+      <div className="flex flex-col items-center mt-auto">
         <button
           onClick={toggleListening}
           className={`w-16 h-16 rounded-full flex items-center justify-center focus:outline-none 
             ${isLoading 
-              ? 'bg-gray-500 cursor-not-allowed' 
+              ? 'bg-gray-700 cursor-not-allowed' 
               : isListening 
-                ? 'bg-red-500 animate-pulse' 
-                : 'bg-blue-500 hover:bg-blue-600'
+                ? 'bg-red-600 animate-pulse' 
+                : 'bg-green-500 hover:bg-green-400'
             } transition-colors`}
           disabled={!speechRecognitionSupported || isLoading}
         >
@@ -235,18 +235,18 @@ const EchoSphere = () => {
       </div>
 
       {isSpeaking && (
-        <div className="fixed bottom-20 right-4 bg-white rounded-full p-2 shadow-lg">
+        <div className="fixed bottom-24 right-4 bg-gray-800 rounded-full p-2 shadow-lg">
           <div className="relative">
-            <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-blue-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-green-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15.465a5 5 0 001.414 1.414m5.657-9.193a1 1 0 112.828 0 1 1 0 01-2.828 0zM12 18.75a6.75 6.75 0 100-13.5 6.75 6.75 0 000 13.5z" />
             </svg>
-            <span className="absolute inset-0 animate-ping rounded-full bg-blue-400 opacity-75"></span>
+            <span className="absolute inset-0 animate-ping rounded-full bg-green-400 opacity-75"></span>
           </div>
         </div>
       )}
 
       {!speechRecognitionSupported && (
-        <p className="text-center text-red-500 mt-4">お使いのブラウザは音声認識をサポートしていません。</p>
+        <p className="text-center text-red-400 mt-4">お使いのブラウザは音声認識をサポートしていません。</p>
       )}
     </div>
   );
