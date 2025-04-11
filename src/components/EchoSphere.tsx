@@ -183,7 +183,7 @@ const EchoSphere = () => {
 
   return (
     <div className="flex flex-col h-screen max-w-md mx-auto p-4 pb-8 overflow-hidden">
-      <h1 className="text-2xl font-bold text-center mb-4 text-green-500">EchoSphere</h1>
+      <h1 className="text-2xl font-bold text-center mb-4 text-green-500">Jarvis Jr.</h1>
       
       {error && (
         <div className="bg-red-900 border border-red-700 text-red-100 px-4 py-3 rounded mb-4">
@@ -194,7 +194,7 @@ const EchoSphere = () => {
       <div className="flex-1 overflow-y-auto mb-4 bg-gray-900 rounded-lg p-4 shadow-inner text-gray-100">
         {messages.length === 0 ? (
           <div className="flex items-center justify-center h-full text-gray-500">
-            <p>ボタンをクリックして会話を開始してください</p>
+            <p>Click the button to start</p>
           </div>
         ) : (
           <div className="space-y-4">
@@ -221,7 +221,7 @@ const EchoSphere = () => {
 
       <div className="mt-auto w-full">
         <div className="flex flex-col items-center mb-6">
-          <p className="text-sm text-gray-400 mb-2">音声で話す</p>
+          <p className="text-sm text-gray-400 mb-2">Voice</p>
           <button
             onClick={toggleListening}
             className={`w-20 h-20 rounded-full flex items-center justify-center focus:outline-none 
@@ -251,7 +251,7 @@ const EchoSphere = () => {
           </button>
         </div>
 
-        <p className="text-sm text-gray-400 mb-2 text-center">または文字で入力</p>
+        <p className="text-sm text-gray-400 mb-2 text-center">or Text</p>
         <form onSubmit={handleSubmit} className="w-full flex space-x-2">
           <input
             type="text"
@@ -259,7 +259,7 @@ const EchoSphere = () => {
             onChange={handleInput}
             ref={inputRef}
             className="flex-1 p-3 border border-gray-700 rounded-lg text-gray-100 bg-gray-800 focus:outline-none focus:ring-2 focus:ring-green-500"
-            placeholder="メッセージを入力..."
+            placeholder="Type a message..."
             disabled={isLoading}
           />
           <button
@@ -286,7 +286,7 @@ const EchoSphere = () => {
       )}
 
       {!speechRecognitionSupported && (
-        <p className="text-center text-red-400 mt-4">お使いのブラウザは音声認識をサポートしていません。</p>
+        <p className="text-center text-red-400 mt-4">Your browser doesn't support speech recognition</p>
       )}
     </div>
   );
